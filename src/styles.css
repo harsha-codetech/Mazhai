@@ -1,0 +1,844 @@
+/* Design system copied from WayLore ("Citrus Club"): tokens, cards, chips, stamps, coins and motion.
+   Only the rain gauge and the flood colours are new to this app. */
+:root {
+  --cream: #fff9ee;
+  --ink: #1b1b1b;
+  --lime: #c9f05a;
+  --tangerine: #ff7548;
+  --lavender: #c8b9f0;
+  --pale: #ebe9e3;
+  --surface: #ffffff;
+  --water: #a8d4f5;
+  --flood-rising: #7fb8ea;
+  --flood-deep: #2f7fd6;
+  --flood-full: #12408f;
+  --shadow-pop: 3px 3px 0 0 var(--ink);
+  --font-display: 'Baloo Thambi 2', 'Noto Sans Tamil', system-ui, sans-serif;
+  --font-body: 'DM Sans Variable', 'Noto Sans Tamil', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Noto Sans Tamil', ui-monospace, monospace;
+  --peek: calc(88px + env(safe-area-inset-bottom));
+}
+
+[data-theme='night'] {
+  --cream: #141414;
+  --ink: #f3efe4;
+  --pale: #2a2a2a;
+  --surface: #1f1f1f;
+  --water: #1d3a55;
+  --flood-rising: #3b6ea5;
+  --flood-deep: #4f9df0;
+  --flood-full: #9fd0ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font: 400 15px/1.45 var(--font-body);
+  color: #1b1b1b;
+  background: #fff9ee;
+}
+
+h1,
+h2,
+p,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--tangerine);
+  outline-offset: 2px;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.dim {
+  opacity: 0.7;
+}
+
+.card {
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.55rem 1rem;
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  box-shadow: var(--shadow-pop);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 0 var(--ink);
+}
+
+.btn-tangerine,
+.btn[aria-pressed='true'] {
+  color: #1b1b1b;
+  background: var(--tangerine);
+}
+
+.btn[aria-pressed='true'] {
+  background: var(--lime);
+}
+
+.menu-tag {
+  min-height: 32px;
+  padding: 0.3rem 0.5rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 40%, transparent);
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, scale 0.12s;
+}
+
+.menu-tag:hover {
+  border-color: var(--ink);
+}
+
+.menu-tag:active {
+  scale: 0.94;
+}
+
+.menu-tag[aria-pressed='true'] {
+  color: var(--cream);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+/* Layout: the counter on the left, the map as the subject */
+.app {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  color: var(--ink);
+  background: var(--cream);
+}
+
+.counter {
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 420px;
+  gap: 14px;
+  padding: 14px 16px 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--cream);
+  border-right: 2px solid var(--ink);
+}
+
+/* Keep sections at full height; the counter scrolls instead of squashing them. */
+.counter > * {
+  flex: none;
+}
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.brand h1,
+.map-brand {
+  font: 800 34px/1 var(--font-display);
+}
+
+.brand [lang='ta'],
+.map-brand [lang='ta'],
+.loading [lang='ta'] {
+  color: var(--tangerine);
+}
+
+.brand p {
+  margin-top: 2px;
+}
+
+.sheet-peek,
+.map-brand {
+  display: none;
+}
+
+/* The two sittings, here used for day and night */
+.sittings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  font: 800 18px/1.15 var(--font-display);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+}
+
+.sittings button {
+  padding: 6px 0;
+  background: var(--surface);
+  border: 0;
+  opacity: 0.7;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.sittings button:hover {
+  opacity: 1;
+}
+
+.sittings button + button {
+  border-left: 2px solid var(--ink);
+}
+
+.sittings .meta {
+  display: block;
+  font-size: 0.6rem;
+  opacity: 0.7;
+}
+
+.sittings [aria-pressed='true'] {
+  color: #1b1b1b;
+  background: var(--lime);
+  opacity: 1;
+}
+
+.sittings [aria-pressed='true'][data-night='true'] {
+  color: var(--lime);
+  background: #1b1b1b;
+}
+
+/* Rain gauge */
+.gauge {
+  display: flex;
+  gap: 16px;
+  padding: 12px;
+}
+
+.gauge-tube {
+  position: relative;
+  flex: 0 0 72px;
+  height: 172px;
+  overflow: hidden;
+  background: var(--pale);
+  border: 2px solid var(--ink);
+  border-top-style: dashed;
+  border-radius: 0 0 14px 14px;
+}
+
+.gauge-water {
+  position: absolute;
+  inset: auto 0 0;
+  background: var(--flood-rising);
+  border-top: 2px solid var(--ink);
+  transition: height 180ms ease-out;
+}
+
+.gauge-ticks {
+  position: absolute;
+  inset: 5px 6px 5px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  font-size: 0.66rem;
+  pointer-events: none;
+}
+
+.gauge-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: ns-resize;
+  opacity: 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  touch-action: none;
+}
+
+.gauge-tube:has(.gauge-input:focus-visible) {
+  outline: 3px solid var(--tangerine);
+  outline-offset: 2px;
+}
+
+.gauge-reading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.gauge-number {
+  font: 800 76px/0.95 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.gauge-word {
+  margin-bottom: auto;
+  font: 800 21px/1.2 var(--font-display);
+}
+
+/* Trip fields */
+.trip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field {
+  position: relative;
+}
+
+.field > label {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.field-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+}
+
+.field-row .menu-tag {
+  min-width: 88px;
+}
+
+.results {
+  position: absolute;
+  inset: calc(100% + 4px) 0 auto;
+  z-index: 40;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.results li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.results li[aria-selected='true'],
+.results li:hover {
+  background: var(--lime);
+  color: #1b1b1b;
+}
+
+.swap {
+  align-self: flex-start;
+}
+
+/* Tiffin token, used for the trip result */
+.token {
+  position: relative;
+  padding: 1rem;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  --hole: var(--cream);
+}
+
+.token-title {
+  font: 800 26px/1.1 var(--font-display);
+}
+
+.token-perf {
+  position: relative;
+  margin: 0.9rem -1rem;
+  border-top: 2px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+.token-perf::before,
+.token-perf::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  width: 22px;
+  height: 22px;
+  background: var(--hole);
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+.token-perf::before {
+  left: -12px;
+  clip-path: inset(0 0 0 50%);
+}
+
+.token-perf::after {
+  right: -12px;
+  clip-path: inset(0 50% 0 0);
+}
+
+.stamp {
+  display: inline-block;
+  flex: none;
+  padding: 0.1rem 0.4rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #1b1b1b;
+  background: var(--stamp-bg, var(--lime));
+  border: 2px solid #1b1b1b;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1.5px currentColor, inset 0 0 0 3px var(--stamp-bg, var(--lime));
+  transform: rotate(-4deg);
+}
+
+.stamp-skip {
+  --stamp-bg: var(--tangerine);
+  transform: rotate(3deg);
+}
+
+.trip-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.trip-row + .trip-row {
+  margin-top: 10px;
+}
+
+.trip-row b {
+  font: 800 20px/1 var(--font-display);
+}
+
+.notice {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.legend {
+  margin-top: auto;
+  font-size: 13px;
+}
+
+.legend ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-bottom: 6px;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 18px;
+  height: 6px;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+}
+
+.swatch-rising {
+  background: var(--flood-rising);
+}
+
+.swatch-deep {
+  background: var(--flood-deep);
+}
+
+.swatch-flooded {
+  background: var(--flood-full);
+}
+
+/* Map */
+.map-wrap,
+.map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--pale);
+}
+
+.map-picking .maplibregl-canvas {
+  cursor: crosshair;
+}
+
+.map-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+}
+
+.map-strip {
+  position: absolute;
+  right: 12px;
+  bottom: 16px;
+  z-index: 10;
+  display: flex;
+  overflow: hidden;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+}
+
+.ctl {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 0;
+  transition: background-color 0.2s, scale 0.12s;
+}
+
+.ctl + .ctl {
+  border-left: 2px solid var(--ink);
+}
+
+.ctl:hover {
+  background: var(--pale);
+}
+
+.ctl:active {
+  scale: 0.94;
+}
+
+.ctl-3d {
+  font-family: var(--font-display);
+}
+
+.ctl[aria-pressed='true'] {
+  color: #1b1b1b;
+  background: var(--lime);
+}
+
+/* Map pins: round token coins */
+.wl-marker {
+  width: 34px;
+  height: 34px;
+}
+
+.wl-pin {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  color: #1b1b1b;
+  background: var(--tangerine);
+  border: 2.5px solid #1b1b1b;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px #fff9ee, inset 0 0 0 3.5px #1b1b1b, 0 3px 0 #1b1b1b;
+  animation: pin-drop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.wl-pin[data-tone='lime'] {
+  background: var(--lime);
+}
+
+.wl-pin-icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 800 15px/1 var(--font-display);
+}
+
+.maplibregl-popup-content {
+  padding: 10px 12px;
+  font: 400 13px/1.4 var(--font-body);
+  color: #1b1b1b;
+  background: #ffffff;
+  border: 2px solid #1b1b1b;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 0 #1b1b1b;
+}
+
+.maplibregl-popup-content strong {
+  font: 800 16px/1.2 var(--font-display);
+}
+
+.maplibregl-popup-content img {
+  display: block;
+  width: 180px;
+  margin-top: 6px;
+  border-radius: 6px;
+}
+
+/* Report dialog */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 45%);
+}
+
+.dialog {
+  width: min(400px, 100%);
+  --hole: #6b6a66;
+}
+
+.photo-field .meta {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.photo-field input {
+  max-width: 100%;
+}
+
+.photo-preview {
+  display: block;
+  width: 100%;
+  max-height: 200px;
+  margin-top: 10px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.error {
+  font-weight: 600;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: 16px;
+}
+
+/* Motion */
+.sheet-motion {
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes pin-drop {
+  from {
+    scale: 0.2;
+    opacity: 0;
+    translate: 0 -14px;
+  }
+}
+
+.token-enter {
+  animation: token-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes token-rise {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.2s ease-out both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.pop-in {
+  animation: pop-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+/* Phones: the counter is a bottom sheet that peeks or opens */
+@media (max-width: 1023px) {
+  .counter {
+    position: fixed;
+    inset: auto 0 0;
+    flex: none;
+    height: 88dvh;
+    padding-top: 0;
+    border-top: 2px solid var(--ink);
+    border-right: 0;
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 -10px 30px rgb(0 0 0 / 18%);
+    transform: translateY(var(--sheet-y));
+  }
+
+  .sheet-peek {
+    display: block;
+    flex: none;
+    margin: 0 -16px;
+    padding: 10px 16px 8px;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .sheet-handle {
+    display: block;
+    width: 44px;
+    height: 6px;
+    margin: 0 auto 8px;
+    background: color-mix(in srgb, var(--ink) 30%, transparent);
+    border-radius: 999px;
+  }
+
+  .peek-title {
+    font: 800 24px/1.1 var(--font-display);
+  }
+
+  .brand {
+    display: none;
+  }
+
+  .map-brand {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 20;
+    display: block;
+    padding: 4px 10px;
+    font-size: 20px;
+    color: #1b1b1b;
+    background: #fff9ee;
+    border: 2px solid #1b1b1b;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 16%), 0 1px 3px rgb(0 0 0 / 12%);
+  }
+
+  .map-strip {
+    bottom: calc(var(--peek) + 14px);
+    flex-direction: column;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 16%), 0 1px 3px rgb(0 0 0 / 12%);
+  }
+
+  .ctl-wide {
+    display: none;
+  }
+
+  .ctl + .ctl {
+    border-left: 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .ctl-wide + .ctl {
+    border-top: 0;
+  }
+
+  .maplibregl-ctrl-bottom-right,
+  .maplibregl-ctrl-bottom-left {
+    bottom: var(--peek);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wl-pin,
+  .token-enter,
+  .fade-in,
+  .pop-in {
+    animation: none !important;
+  }
+
+  .sheet-motion,
+  .gauge-water {
+    transition: none;
+  }
+}
+
+/* Keep credits to a tap on phones so they don't cover the map. */
+@media (max-width: 1023px) {
+  .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner {
+    display: none;
+  }
+  .maplibregl-ctrl-attrib.maplibregl-compact-show:focus-within .maplibregl-ctrl-attrib-inner {
+    display: block;
+  }
+}
+
+.map-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 15;
+  padding: 0.4rem 0.7rem;
+  white-space: nowrap;
+  color: #fff9ee;
+  background: #1b1b1b;
+  border-radius: 4px;
+  transform: translate(-50%, -50%);
+}
+
+.popup-action {
+  display: block;
+  margin-top: 8px;
+}

@@ -1,0 +1,28 @@
+{
+  "name": "mazhai",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "test": "node --test \"src/lib/*.test.js\"",
+    "validate": "node scripts/validate.mjs",
+    "build:data": "node --max-old-space-size=6144 scripts/build-data.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource/baloo-thambi-2": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/noto-sans-tamil": "^5.3.0",
+    "maplibre-gl": "^6.16.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.2.1",
+    "geotiff": "^3.0.5",
+    "vite": "^8.3.6"
+  }
+}
